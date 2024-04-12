@@ -1,0 +1,47 @@
+var getProductDetails =
+    exports.getProductDetailsForCriteria = Promise.promisify(async function (criteria, callback) {
+        let searchObj = {};
+        if (!!criteria.currentPage && criteria.currentPage != '') {
+            searchObj.currentPage = criteria.currentPage
+        } else {
+            searchObj.currentPage = 1
+        }
+        if (!!criteria.orderBy && criteria.orderBy != '') {
+            searchObj.orderBy = criteria.orderBy
+        } else {
+            searchObj.orderBy = criteria.createdAt
+        }
+
+        if (!!criteria.searchBy && criteria.searchBy != '') {
+            searchObj.searchBy = criteria.searchBy
+        } else {
+            searchObj.searchBy = ''
+        }
+        if (!!criteria.searchFields && criteria.searchFields != '') {
+            searchObj.searchFields = criteria.searchFields
+        } else {
+            searchObj.searchFields = [];
+        }
+        if (!!criteria.orderDir && criteria.orderDir != '') {
+            searchObj.orderDir = criteria.orderDir
+        } else {
+            searchObj.orderDir = 'desc';
+        }
+        try {
+            let productRes = await Product.find(searchObj)
+                .sort({ name: 1 })
+
+            let res = {
+                "currentPage": 1,
+                "pageSize": 10,
+                "totalPages": 3,
+                "totalCount": 25,
+                "data": productRes
+            }
+            callback(null, res);
+        }
+        catch (err) {
+            console.error('Error occurred:', err);
+            callback(err, null);
+        }
+    })
